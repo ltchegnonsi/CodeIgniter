@@ -22,12 +22,6 @@ model class might look like::
 		public $content;
 		public $date;
 
-		public function __construct()
-		{
-			// Call the CI_Model constructor
-			parent::__construct();
-		}
-
 		public function get_last_ten_entries()
 		{
 			$query = $this->db->get('entries', 10);
@@ -73,11 +67,6 @@ The basic prototype for a model class is this::
 
 	class Model_name extends CI_Model {
 
-		public function __construct()
-		{
-			parent::__construct();
-		}
-
 	}
 
 Where **Model_name** is the name of your class. Class names **must** have
@@ -87,11 +76,6 @@ sure your class extends the base Model class.
 The file name must match the class name. For example, if this is your class::
 
 	class User_model extends CI_Model {
-
-		public function __construct()
-		{
-			parent::__construct();
-		}
 
 	}
 
@@ -137,7 +121,7 @@ view::
 		{
 			$this->load->model('blog');
 
-			$data['query'] = $this->Blog->get_last_ten_entries();
+			$data['query'] = $this->blog->get_last_ten_entries();
 
 			$this->load->view('blog', $data);
 		}

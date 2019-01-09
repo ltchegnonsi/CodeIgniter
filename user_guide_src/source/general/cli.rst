@@ -13,7 +13,7 @@ What is the CLI?
 
 The command-line interface is a text-based method of interacting with
 computers. For more information, check the `Wikipedia
-article <http://en.wikipedia.org/wiki/Command-line_interface>`_.
+article <https://en.wikipedia.org/wiki/Command-line_interface>`_.
 
 Why run via the command-line?
 =============================
@@ -23,7 +23,7 @@ but they are not always obvious.
 
 -  Run your cron-jobs without needing to use *wget* or *curl*
 -  Make your cron-jobs inaccessible from being loaded in the URL by
-   checking the return value of :func:`is_cli()`.
+   checking the return value of :php:func:`is_cli()`.
 -  Make interactive "tasks" that can do things like set permissions,
    prune cache folders, run backups, etc.
 -  Integrate with other applications in other languages. For example, a
@@ -47,11 +47,11 @@ in it::
 
 Then save the file to your *application/controllers/* folder.
 
-Now normally you would visit the your site using a URL similar to this::
+Now normally you would visit the site using a URL similar to this::
 
 	example.com/index.php/tools/message/to
 
-Instead, we are going to open Terminal in Mac/Linux or go to Run > "cmd"
+Instead, we are going to open the terminal in Mac/Linux or go to Run > "cmd"
 in Windows and navigate to our CodeIgniter project.
 
 .. code-block:: bash
@@ -65,8 +65,8 @@ If you did it right, you should see *Hello World!* printed.
 
 	$ php index.php tools message "John Smith"
 
-Here we are passing it a argument in the same way that URL parameters
-work. "John Smith" is passed as a argument and output is::
+Here we are passing it an argument in the same way that URL parameters
+work. "John Smith" is passed as an argument and the output is::
 
 	Hello John Smith!
 

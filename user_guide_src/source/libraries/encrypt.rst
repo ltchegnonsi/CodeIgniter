@@ -2,13 +2,8 @@
 Encrypt Class
 #############
 
-The Encrypt Class provides two-way data encryption. It uses a scheme
-that either compiles the message using a randomly hashed bitwise XOR
-encoding scheme, or is encrypted using the Mcrypt library. If Mcrypt is
-not available on your server the encoded message will still provide a
-reasonable degree of security for encrypted sessions or other such
-"light" purposes. If Mcrypt is available, you'll be provided with a high
-degree of security appropriate for storage.
+The Encrypt Class provides two-way data encryption. It encrypted using
+the Mcrypt PHP extension, which is required for the Encrypt Class to run.
 
 .. important:: This library has been DEPRECATED and is only kept for
 	backwards compatibility. Please use the new :doc:`Encryption Library
@@ -85,9 +80,9 @@ Once loaded, the Encrypt library object will be available using::
 Class Reference
 ***************
 
-.. class:: CI_Encrypt
+.. php:class:: CI_Encrypt
 
-	.. method:: encode($string[, $key = ''])
+	.. php:method:: encode($string[, $key = ''])
 
 		:param	string	$string: Data to encrypt
 		:param	string	$key: Encryption key
@@ -108,7 +103,7 @@ Class Reference
 
 			$encrypted_string = $this->encrypt->encode($msg, $key);
 
-	.. method:: decode($string[, $key = ''])
+	.. php:method:: decode($string[, $key = ''])
 
 		:param	string	$string: String to decrypt
 		:param	string	$key: Encryption key
@@ -129,7 +124,7 @@ Class Reference
 
 			$encrypted_string = $this->encrypt->decode($msg, $key);
 
-	.. method:: set_cipher($cipher)
+	.. php:method:: set_cipher($cipher)
 
 		:param	int	$cipher: Valid PHP MCrypt cypher constant
 		:returns:	CI_Encrypt instance (method chaining)
@@ -140,14 +135,14 @@ Class Reference
 
 			$this->encrypt->set_cipher(MCRYPT_BLOWFISH);
 
-		Please visit php.net for a list of `available ciphers <http://php.net/mcrypt>`_.
+		Please visit php.net for a list of `available ciphers <https://secure.php.net/mcrypt>`_.
 
 		If you'd like to manually test whether your server supports MCrypt you
 		can use::
 
 			echo extension_loaded('mcrypt') ? 'Yup' : 'Nope';
 
-	.. method:: set_mode($mode)
+	.. php:method:: set_mode($mode)
 
 		:param	int	$mode: Valid PHP MCrypt mode constant
 		:returns:	CI_Encrypt instance (method chaining)
@@ -158,9 +153,9 @@ Class Reference
 
 			$this->encrypt->set_mode(MCRYPT_MODE_CFB);
 
-		Please visit php.net for a list of `available modes <http://php.net/mcrypt>`_.
+		Please visit php.net for a list of `available modes <https://secure.php.net/mcrypt>`_.
 
-	.. method:: encode_from_legacy($string[, $legacy_mode = MCRYPT_MODE_ECB[, $key = '']])
+	.. php:method:: encode_from_legacy($string[, $legacy_mode = MCRYPT_MODE_ECB[, $key = '']])
 
 		:param	string	$string: String to encrypt
 		:param	int	$legacy_mode: Valid PHP MCrypt cipher constant

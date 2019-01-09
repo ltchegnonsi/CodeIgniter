@@ -2,26 +2,37 @@
 /**
  * CodeIgniter
  *
- * An open source application development framework for PHP 5.2.4 or newer
+ * An open source application development framework for PHP
  *
- * NOTICE OF LICENSE
+ * This content is released under the MIT License (MIT)
  *
- * Licensed under the Open Software License version 3.0
+ * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
  *
- * This source file is subject to the Open Software License (OSL 3.0) that is
- * bundled with this package in the files license.txt / license.rst.  It is
- * also available through the world wide web at this URL:
- * http://opensource.org/licenses/OSL-3.0
- * If you did not receive a copy of the license and are unable to obtain it
- * through the world wide web, please send an email to
- * licensing@ellislab.com so we can send you a copy immediately.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * @package		CodeIgniter
- * @author		EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (http://ellislab.com/)
- * @license		http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
- * @link		http://codeigniter.com
- * @since		Version 3.0
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @package	CodeIgniter
+ * @author	EllisLab Dev Team
+ * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
+ * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
+ * @license	https://opensource.org/licenses/MIT	MIT License
+ * @link	https://codeigniter.com
+ * @since	Version 3.0.0
  * @filesource
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -33,8 +44,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	CodeIgniter
  * @category	Compatibility
  * @author		Andrey Andreev
- * @link		http://codeigniter.com/user_guide/
- * @link		http://php.net/mbstring
+ * @link		https://codeigniter.com/user_guide/
+ * @link		https://secure.php.net/mbstring
  */
 
 // ------------------------------------------------------------------------
@@ -54,16 +65,16 @@ if ( ! function_exists('mb_strlen'))
 	 * WARNING: This function WILL fall-back to strlen()
 	 * if iconv is not available!
 	 *
-	 * @link	http://php.net/mb_strlen
+	 * @link	https://secure.php.net/mb_strlen
 	 * @param	string	$str
 	 * @param	string	$encoding
-	 * @return	string
+	 * @return	int
 	 */
 	function mb_strlen($str, $encoding = NULL)
 	{
 		if (ICONV_ENABLED === TRUE)
 		{
-			return iconv_strlen($str, isset($charset) ? $charset : config_item('charset'));
+			return iconv_strlen($str, isset($encoding) ? $encoding : config_item('charset'));
 		}
 
 		log_message('debug', 'Compatibility (mbstring): iconv_strlen() is not available, falling back to strlen().');
@@ -81,7 +92,7 @@ if ( ! function_exists('mb_strpos'))
 	 * WARNING: This function WILL fall-back to strpos()
 	 * if iconv is not available!
 	 *
-	 * @link	http://php.net/mb_strpos()
+	 * @link	https://secure.php.net/mb_strpos
 	 * @param	string	$haystack
 	 * @param	string	$needle
 	 * @param	int	$offset
@@ -110,7 +121,7 @@ if ( ! function_exists('mb_substr'))
 	 * WARNING: This function WILL fall-back to substr()
 	 * if iconv is not available.
 	 *
-	 * @link	http://php.net/mb_substr
+	 * @link	https://secure.php.net/mb_substr
 	 * @param	string	$str
 	 * @param	int	$start
 	 * @param	int 	$length
@@ -136,6 +147,3 @@ if ( ! function_exists('mb_substr'))
 			: substr($str, $start);
 	}
 }
-
-/* End of file mbstring.php */
-/* Location: ./system/core/compat/mbstring.php */

@@ -95,24 +95,30 @@ The Table Class permits you to set a table template with which you can
 specify the design of your layout. Here is the template prototype::
 
 	$template = array(
-		'table_open'          => '<table border="0" cellpadding="4" cellspacing="0">',
+		'table_open'		=> '<table border="0" cellpadding="4" cellspacing="0">',
 
-		'heading_row_start'   => '<tr>',
-		'heading_row_end'     => '</tr>',
-		'heading_cell_start'  => '<th>',
-		'heading_cell_end'    => '</th>',
+		'thead_open'		=> '<thead>',
+		'thead_close'		=> '</thead>',
 
-		'row_start'           => '<tr>',
-		'row_end'             => '</tr>',
-		'cell_start'          => '<td>',
-		'cell_end'            => '</td>',
+		'heading_row_start'	=> '<tr>',
+		'heading_row_end'	=> '</tr>',
+		'heading_cell_start'	=> '<th>',
+		'heading_cell_end'	=> '</th>',
 
-		'row_alt_start'       => '<tr>',
-		'row_alt_end'         => '</tr>',
-		'cell_alt_start'      => '<td>',
-		'cell_alt_end'        => '</td>',
+		'tbody_open'		=> '<tbody>',
+		'tbody_close'		=> '</tbody>',
 
-		'table_close'         => '</table>'
+		'row_start'		=> '<tr>',
+		'row_end'		=> '</tr>',
+		'cell_start'		=> '<td>',
+		'cell_end'		=> '</td>',
+
+		'row_alt_start'		=> '<tr>',
+		'row_alt_end'		=> '</tr>',
+		'cell_alt_start'	=> '<td>',
+		'cell_alt_end'		=> '</td>',
+
+		'table_close'		=> '</table>'
 	);
 
 	$this->table->set_template($template);
@@ -137,7 +143,7 @@ You can also set defaults for these in a config file.
 Class Reference
 ***************
 
-.. class:: CI_Table
+.. php:class:: CI_Table
 
 	.. attribute:: $function = NULL
 
@@ -156,7 +162,7 @@ Class Reference
 
 			<td>Fred</td><td>&lt;strong&gt;Blue&lt;/strong&gt;</td><td>Small</td>
 
-	.. method:: generate([$table_data = NULL])
+	.. php:method:: generate([$table_data = NULL])
 
 		:param	mixed	$table_data: Data to populate the table rows with
 		:returns:	HTML table
@@ -164,7 +170,7 @@ Class Reference
 
 		Returns a string containing the generated table. Accepts an optional parameter which can be an array or a database result object.
 
-	.. method:: set_caption($caption)
+	.. php:method:: set_caption($caption)
 
 		:param	string	$caption: Table caption
 		:returns:	CI_Table instance (method chaining)
@@ -175,7 +181,7 @@ Class Reference
 
 			$this->table->set_caption('Colors');
 
-	.. method:: set_heading([$args = array()[, ...]])
+	.. php:method:: set_heading([$args = array()[, ...]])
 
 		:param	mixed	$args: An array or multiple strings containing the table column titles
 		:returns:	CI_Table instance (method chaining)
@@ -187,7 +193,7 @@ Class Reference
 
 			$this->table->set_heading(array('Name', 'Color', 'Size'));
 
-	.. method:: add_row([$args = array()[, ...]])
+	.. php:method:: add_row([$args = array()[, ...]])
 
 		:param	mixed	$args: An array or multiple strings containing the row values
 		:returns:	CI_Table instance (method chaining)
@@ -208,7 +214,7 @@ Class Reference
 			// generates
 			// <td class='highlight' colspan='2'>Blue</td><td>Red</td><td>Green</td>
 
-	.. method:: make_columns([$array = array()[, $col_limit = 0]])
+	.. php:method:: make_columns([$array = array()[, $col_limit = 0]])
 
 		:param	array	$array: An array containing multiple rows' data
 		:param	int	$col_limit: Count of columns in the table
@@ -238,7 +244,7 @@ Class Reference
 			</table>
 
 
-	.. method:: set_template($template)
+	.. php:method:: set_template($template)
 
 		:param	array	$template: An associative array containing template values
 		:returns:	TRUE on success, FALSE on failure
@@ -253,7 +259,7 @@ Class Reference
 		
 			$this->table->set_template($template);
 
-	.. method:: set_empty($value)
+	.. php:method:: set_empty($value)
 
 		:param	mixed	$value: Value to put in empty cells
 		:returns:	CI_Table instance (method chaining)
@@ -264,16 +270,21 @@ Class Reference
 
 			$this->table->set_empty("&nbsp;");
 
-	.. method:: clear()
+	.. php:method:: clear()
 
 		:returns:	CI_Table instance (method chaining)
 		:rtype:	CI_Table
 
-		Lets you clear the table heading and row data. If you need to show multiple tables with different data you should to call this method
-		after each table has been generated to clear the previous table information. Example::
+		Lets you clear the table heading, row data and caption. If
+		you need to show multiple tables with different data you
+		should to call this method after each table has been
+		generated to clear the previous table information.
+
+		Example ::
 
 			$this->load->library('table');
 
+			$this->table->set_caption('Preferences');
 			$this->table->set_heading('Name', 'Color', 'Size');
 			$this->table->add_row('Fred', 'Blue', 'Small');
 			$this->table->add_row('Mary', 'Red', 'Large');
@@ -283,6 +294,7 @@ Class Reference
 
 			$this->table->clear();
 
+			$this->table->set_caption('Shipping');
 			$this->table->set_heading('Name', 'Day', 'Delivery');
 			$this->table->add_row('Fred', 'Wednesday', 'Express');
 			$this->table->add_row('Mary', 'Monday', 'Air');

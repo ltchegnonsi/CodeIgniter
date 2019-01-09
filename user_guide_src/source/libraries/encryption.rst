@@ -2,16 +2,21 @@
 Encryption Library
 ##################
 
+.. important:: DO NOT use this or any other *encryption* library for
+	user password storage! Passwords must be *hashed* instead, and you
+	should do that via PHP's own `Password Hashing extension
+	<https://secure.php.net/password>`_.
+
 The Encryption Library provides two-way data encryption. To do so in
 a cryptographically secure way, it utilizes PHP extensions that are
 unfortunately not always available on all systems.
-You must meet one of the following dependancies in order to use this
+You must meet one of the following dependencies in order to use this
 library:
 
-- `OpenSSL <http://php.net/openssl>`_ (and PHP 5.3.3)
-- `MCrypt <http://php.net/mcrypt>`_ (and `MCRYPT_DEV_URANDOM` availability)
+- `OpenSSL <https://secure.php.net/openssl>`_
+- `MCrypt <https://secure.php.net/mcrypt>`_ (and `MCRYPT_DEV_URANDOM` availability)
 
-If neither of the above dependancies is met, we simply cannot offer
+If neither of the above dependencies is met, we simply cannot offer
 you a good enough implementation to meet the high standards required
 for proper cryptography.
 
@@ -33,11 +38,11 @@ Like most other classes in CodeIgniter, the Encryption library is
 initialized in your controller using the ``$this->load->library()``
 method::
 
-	$this->load->library('encrypt');
+	$this->load->library('encryption');
 
 Once loaded, the Encryption library object will be available using::
 
-	$this->encrypt
+	$this->encryption
 
 Default behavior
 ================
@@ -58,7 +63,7 @@ encryption and authentication is a bad practice.
 Because of that, two separate keys are derived from your already configured
 *encryption_key*: one for encryption and one for authentication. This is
 done via a technique called `HMAC-based Key Derivation Function
-<http://en.wikipedia.org/wiki/HKDF>`_ (HKDF).
+<https://en.wikipedia.org/wiki/HKDF>`_ (HKDF).
 
 Setting your encryption_key
 ===========================
@@ -70,7 +75,7 @@ process that allows you to be the only one who is able to decrypt data
 that you've decided to hide from the eyes of the public.
 After one key is used to encrypt data, that same key provides the **only**
 means to decrypt it, so not only must you chose one carefully, but you
-must not lose it or you will also use the encrypted data.
+must not lose it or you will also lose access to the data.
 
 It must be noted that to ensure maximum security, such key *should* not
 only be as strong as possible, but also often changed. Such behavior
@@ -84,13 +89,18 @@ your server is not totally under your control it's impossible to ensure
 key security so you may want to think carefully before using it for
 anything that requires high security, like storing credit card numbers.
 
-Your encryption key should be as long as the encyption algorithm in use
-allows. For AES-128, that's 128 bits or 16 bytes (charcters) long. The
-key should be as random as possible and it should **not** be a simple
-text string.
-
+Your encryption key **must** be as long as the encyption algorithm in use
+allows. For AES-128, that's 128 bits or 16 bytes (characters) long.
 You will find a table below that shows the supported key lengths of
 different ciphers.
+
+The key should be as random as possible and it **must not** be a regular
+text string, nor the output of a hashing function, etc. In order to create
+a proper key, you must use the Encryption library's ``create_key()`` method
+::
+
+	// $key will be assigned a 16-byte (128-bit) random key
+	$key = $this->encryption->create_key(16);
 
 The key can be either stored in your *application/config/config.php*, or
 you can design your own storage mechanism and pass the key dynamically
@@ -100,6 +110,18 @@ To save your key to your *application/config/config.php*, open the file
 and set::
 
 	$config['encryption_key'] = 'YOUR KEY';
+
+You'll notice that the ``create_key()`` method outputs binary data, which
+is hard to deal with (i.e. a copy-paste may damage it), so you may use
+``bin2hex()``, ``hex2bin()`` or Base64-encoding to work with the key in
+a more friendly manner. For example::
+
+	// Get a hex-encoded representation of the key:
+	$key = bin2hex($this->encryption->create_key(16));
+
+	// Put the same value in your config with hex2bin(),
+	// so that it is still passed as binary to the library:
+	$config['encryption_key'] = hex2bin(<your hex-encoded key>);
 
 .. _ciphers-and-modes:
 
@@ -149,7 +171,7 @@ RC4 / ARCFour            rc4                40-2048 / 5-256              Stream
 .. note:: Even though CAST5 supports key lengths lower than 128 bits
 	(16 bytes), in fact they will just be zero-padded to the
 	maximum length, as specified in `RFC 2144
-	<http://tools.ietf.org/rfc/rfc2144.txt>`_.
+	<https://tools.ietf.org/rfc/rfc2144.txt>`_.
 
 .. note:: Blowfish supports key lengths as small as 32 bits (4 bytes), but
 	our tests have shown that only lengths of 128 bits (16 bytes) or
@@ -168,9 +190,9 @@ but regardless, here's a list of most of them:
 ============== ========= ============================== =========================================
 Cipher name    Driver    Key lengths (bits / bytes)     Supported modes
 ============== ========= ============================== =========================================
-AES-128        OpenSSL   128 / 16                       CBC, CTR, CFB, CFB8, OFB, ECB, GCM, XTS
-AES-192        OpenSSL   192 / 24                       CBC, CTR, CFB, CFB8, OFB, ECB, GCM, XTS
-AES-256        OpenSSL   256 / 32                       CBC, CTR, CFB, CFB8, OFB, ECB, GCM, XTS
+AES-128        OpenSSL   128 / 16                       CBC, CTR, CFB, CFB8, OFB, ECB, XTS
+AES-192        OpenSSL   192 / 24                       CBC, CTR, CFB, CFB8, OFB, ECB, XTS
+AES-256        OpenSSL   256 / 32                       CBC, CTR, CFB, CFB8, OFB, ECB, XTS
 Rijndael-128   MCrypt    128 / 16, 192 / 24, 256 / 32   CBC, CTR, CFB, CFB8, OFB, OFB8, ECB
 Rijndael-192   MCrypt    128 / 16, 192 / 24, 256 / 32   CBC, CTR, CFB, CFB8, OFB, OFB8, ECB
 Rijndael-256   MCrypt    128 / 16, 192 / 24, 256 / 32   CBC, CTR, CFB, CFB8, OFB, OFB8, ECB
@@ -234,7 +256,6 @@ CFB8        cfb8               MCrypt, OpenSSL   Same as CFB, but operates in 8-
 OFB         ofb                MCrypt, OpenSSL   N/A
 OFB8        ofb8               MCrypt            Same as OFB, but operates in 8-bit mode (not recommended).
 ECB         ecb                MCrypt, OpenSSL   Ignores IV (not recommended).
-GCM         gcm                OpenSSL           Provides authentication and therefore doesn't need a HMAC.
 XTS         xts                OpenSSL           Usually used for encrypting random access data such as RAM or hard-disk storage.
 Stream      stream             MCrypt, OpenSSL   This is not actually a mode, it just says that a stream cipher is being used. Required because of the general cipher+mode initialization process.
 =========== ================== ================= ===================================================================================================================================================
@@ -246,10 +267,9 @@ It's probably important for you to know that an encrypted string is usually
 longer than the original, plain-text string (depending on the cipher).
 
 This is influenced by the cipher algorithm itself, the IV prepended to the
-cipher-text and (unless you are using GCM mode) the HMAC authentication
-message that is also prepended. Furthermore, the encrypted message is also
-Base64-encoded so that it is safe for storage and transmission, regardless
-of a possible character set in use.
+cipher-text and the HMAC authentication message that is also prepended.
+Furthermore, the encrypted message is also Base64-encoded so that it is safe
+for storage and transmission, regardless of a possible character set in use.
 
 Keep this information in mind when selecting your data storage mechanism.
 Cookies, for example, can only hold 4K of information.
@@ -362,7 +382,7 @@ the hood:
 
   #. Check if the string is long enough, separate the HMAC out of
      it and validate if it is correct (this is done in a way that
-     prevents timing attacks agains it). Return FALSE if either of
+     prevents timing attacks against it). Return FALSE if either of
      the checks fails.
 
   #. Base64-decode the string.
@@ -425,9 +445,6 @@ Option        Default value   Mandatory / Optional          Description
 cipher        N/A             Yes                           Encryption algorithm (see :ref:`ciphers-and-modes`).
 mode          N/A             Yes                           Encryption mode (see :ref:`encryption-modes`).
 key           N/A             Yes                           Encryption key.
-iv            N/A             No                            Initialization vector (IV).
-                                                            If not provided it will be automatically generated
-                                                            during encryption and looked for during decryption.
 hmac          TRUE            No                            Whether to use a HMAC.
                                                             Boolean. If set to FALSE, then *hmac_digest* and
                                                             *hmac_key* will be ignored.
@@ -443,9 +460,6 @@ raw_data      FALSE           No                            Whether the cipher-t
 	a mandatory parameter is not provided or if a provided
 	value is incorrect. This includes *hmac_key*, unless *hmac*
 	is set to FALSE.
-
-.. note:: If GCM mode is used, *hmac* will always be FALSE. This is
-	because GCM mode itself provides authentication.
 
 .. _digests:
 
@@ -468,7 +482,7 @@ The reason for not including other popular algorithms, such as
 MD5 or SHA1 is that they are no longer considered secure enough
 and as such, we don't want to encourage their usage.
 If you absolutely need to use them, it is easy to do so via PHP's
-native `hash_hmac() <http://php.net/hash_hmac()>`_ function.
+native `hash_hmac() <https://secure.php.net/manual/en/function.hash-hmac.php>`_ function.
 
 Stronger algorithms of course will be added in the future as they
 appear and become widely available.
@@ -477,9 +491,9 @@ appear and become widely available.
 Class Reference
 ***************
 
-.. class:: CI_Encryption
+.. php:class:: CI_Encryption
 
-	.. method:: initialize($params)
+	.. php:method:: initialize($params)
 
 		:param	array	$params: Configuration parameters
 		:returns:	CI_Encryption instance (method chaining)
@@ -496,7 +510,7 @@ Class Reference
 
 		Please refer to the :ref:`configuration` section for detailed info.
 
-	.. method:: encrypt($data[, $params = NULL])
+	.. php:method:: encrypt($data[, $params = NULL])
 
 		:param	string	$data: Data to encrypt
 		:param	array	$params: Optional parameters
@@ -512,7 +526,7 @@ Class Reference
 		Please refer to the :ref:`custom-parameters` section for information
 		on the optional parameters.
 
-	.. method:: decrypt($data[, $params = NULL])
+	.. php:method:: decrypt($data[, $params = NULL])
 
 		:param	string	$data: Data to decrypt
 		:param	array	$params: Optional parameters
@@ -528,7 +542,16 @@ Class Reference
 		Please refer to the :ref:`custom-parameters` secrion for information
 		on the optional parameters.
 
-	.. method:: hkdf($key[, $digest = 'sha512'[, $salt = NULL[, $length = NULL[, $info = '']]]])
+	.. php:method:: create_key($length)
+
+		:param	int	$length: Output length
+		:returns:	A pseudo-random cryptographic key with the specified length, or FALSE on failure
+		:rtype:	string
+
+		Creates a cryptographic key by fetching random data from
+		the operating system's sources (i.e. /dev/urandom).
+
+	.. php:method:: hkdf($key[, $digest = 'sha512'[, $salt = NULL[, $length = NULL[, $info = '']]]])
 
 		:param	string	$key: Input key material
 		:param	string	$digest: A SHA-2 family digest algorithm
@@ -536,6 +559,7 @@ Class Reference
 		:param	int	$length: Optional output length
 		:param	string	$info: Optional context/application-specific info
 		:returns:	A pseudo-random key or FALSE on failure
+		:rtype:	string
 
 		Derives a key from another, presumably weaker key.
 

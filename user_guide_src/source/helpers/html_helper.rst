@@ -25,11 +25,11 @@ Available Functions
 The following functions are available:
 
 
-.. function:: heading([$data = ''[, $h = '1'[, $attributes = '']]])
+.. php:function:: heading([$data = ''[, $h = '1'[, $attributes = '']]])
 
 	:param	string	$data: Content
 	:param	string	$h: Heading level
-	:param	array	$attributes: HTML attributes
+	:param	mixed	$attributes: HTML attributes
 	:returns:	HTML heading tag
 	:rtype:	string
 
@@ -41,17 +41,20 @@ The following functions are available:
 	The above would produce: <h3>Welcome!</h3>
 
 	Additionally, in order to add attributes to the heading tag such as HTML
-	classes, ids or inline styles, a third parameter is available::
+	classes, ids or inline styles, a third parameter accepts either a string
+	or an array::
 
-		echo heading('Welcome!', 3, 'class="pink"')
+		echo heading('Welcome!', 3, 'class="pink"');
+		echo heading('How are you?', 4, array('id' => 'question', 'class' => 'green'));
 
 	The above code produces:
 
 	.. code-block:: html
 
 		<h3 class="pink">Welcome!<h3>
+		<h4 id="question" class="green">How are you?</h4>
 
-.. function:: img([$src = ''[, $index_page = FALSE[, $attributes = '']]])
+.. php:function:: img([$src = ''[, $index_page = FALSE[, $attributes = '']]])
 
 	:param	string	$src: Image source data
 	:param	bool	$index_page: Whether to treat $src as a routed URI string
@@ -90,7 +93,7 @@ The following functions are available:
 		img($image_properties);
 		// <img src="http://site.com/index.php/images/picture.jpg" alt="Me, demonstrating how to eat 4 slices of pizza at one time" class="post_images" width="200" height="200" title="That was quite a night" rel="lightbox" />
 
-.. function:: link_tag([$href = ''[, $rel = 'stylesheet'[, $type = 'text/css'[, $title = ''[, $media = ''[, $index_page = FALSE]]]]]])
+.. php:function:: link_tag([$href = ''[, $rel = 'stylesheet'[, $type = 'text/css'[, $title = ''[, $media = ''[, $index_page = FALSE]]]]]])
 
 	:param	string	$href: What are we linking to
 	:param	string	$rel: Relation type
@@ -135,14 +138,14 @@ The following functions are available:
 		// <link href="http://site.com/css/printer.css" rel="stylesheet" type="text/css" media="print" />
 
 
-.. function:: ul($list[, $attributes = ''])
+.. php:function:: ul($list[, $attributes = ''])
 
 	:param	array	$list: List entries
 	:param	array	$attributes: HTML attributes
 	:returns:	HTML-formatted unordered list
 	:rtype:	string
 
-	Permits you to generate ordered or unordered HTML lists from simple or
+	Permits you to generate unordered HTML lists from simple or
 	multi-dimensional arrays. Example::
 
 		$list = array(
@@ -255,17 +258,17 @@ The following functions are available:
 			</li>
 		</ul>
 
-.. function:: ol($list, $attributes = '')
+.. php:function:: ol($list, $attributes = '')
 
 	:param	array	$list: List entries
 	:param	array	$attributes: HTML attributes
 	:returns:	HTML-formatted ordered list
 	:rtype:	string
 
-	Identical to :func:`ul()`, only it produces the <ol> tag for
+	Identical to :php:func:`ul()`, only it produces the <ol> tag for
 	ordered lists instead of <ul>.
 
-.. function:: meta([$name = ''[, $content = ''[, $type = 'name'[, $newline = "\n"]]]])
+.. php:function:: meta([$name = ''[, $content = ''[, $type = 'name'[, $newline = "\n"]]]])
 
 	:param	string	$name: Meta name
 	:param	string	$content: Meta content
@@ -283,7 +286,7 @@ The following functions are available:
 		// Generates:  <meta name="description" content="My Great Site" />
 
 		echo meta('Content-type', 'text/html; charset=utf-8', 'equiv');
-		// Note the third parameter.  Can be "equiv" or "name"
+		// Note the third parameter.  Can be "charset", "http-equiv", "name" or "property"
 		// Generates:  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 
 		echo meta(array('name' => 'robots', 'content' => 'no-cache'));
@@ -307,8 +310,13 @@ The following functions are available:
 				'content' => 'no-cache'
 			),
 			array(
-				'name' => 'Content-type',
-				'content' => 'text/html; charset=utf-8', 'type' => 'equiv'
+				'name' => 'Content-Type',
+				'type' => 'http-equiv',
+				'content' => 'text/html; charset=utf-8'
+			),
+			array(
+				'name' => 'UTF-8',
+				'type' => 'charset'
 			)
 		);
 
@@ -318,23 +326,24 @@ The following functions are available:
 		// <meta name="description" content="My Great Site" />
 		// <meta name="keywords" content="love, passion, intrigue, deception" />
 		// <meta name="robots" content="no-cache" />
-		// <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		// <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		// <meta charset="UTF-8" />
 
 
-.. function:: doctype([$type = 'xhtml1-strict'])
+.. php:function:: doctype([$type = 'html5'])
 
 	:param	string	$type: Doctype name
 	:returns:	HTML DocType tag
 	:rtype:	string
 
-	Helps you generate document type declarations, or DTD's. XHTML 1.0
-	Strict is used by default, but many doctypes are available.
+	Helps you generate document type declarations, or DTD's. HTML 5
+	is used by default, but many doctypes are available.
 
 	Example::
 
-		echo doctype(); // <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+		echo doctype(); // <!DOCTYPE html>
 
-		echo doctype('html4-trans'); // <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+		echo doctype('html4-trans'); // <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "https://www.w3.org/TR/html4/strict.dtd">
 
 	The following is a list of doctype choices. These are configurable, and
 	pulled from application/config/doctypes.php
@@ -342,63 +351,23 @@ The following functions are available:
 	=============================== =================== ==================================================================================================================================================
 	Document type                   Option              Result
 	=============================== =================== ==================================================================================================================================================
-	XHTML 1.1                       xhtml11             <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-	XHTML 1.0 Strict                xhtml1-strict       <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-	XHTML 1.0 Transitional          xhtml1-trans        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-	XHTML 1.0 Frameset              xhtml1-frame        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
-	XHTML Basic 1.1                 xhtml-basic11       <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.1//EN" "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd">
+	XHTML 1.1                       xhtml11             <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "https://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+	XHTML 1.0 Strict                xhtml1-strict       <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+	XHTML 1.0 Transitional          xhtml1-trans        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	XHTML 1.0 Frameset              xhtml1-frame        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+	XHTML Basic 1.1                 xhtml-basic11       <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.1//EN" "https://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd">
 	HTML 5                          html5               <!DOCTYPE html>
-	HTML 4 Strict                   html4-strict        <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-	HTML 4 Transitional             html4-trans         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-	HTML 4 Frameset                 html4-frame         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
-	MathML 1.01                     mathml1             <!DOCTYPE math SYSTEM "http://www.w3.org/Math/DTD/mathml1/mathml.dtd">
-	MathML 2.0                      mathml2             <!DOCTYPE math PUBLIC "-//W3C//DTD MathML 2.0//EN" "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd">
-	SVG 1.0                         svg10               <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
-	SVG 1.1 Full                    svg11               <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-	SVG 1.1 Basic                   svg11-basic         <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1 Basic//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11-basic.dtd">
-	SVG 1.1 Tiny                    svg11-tiny          <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1 Tiny//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11-tiny.dtd">
-	XHTML+MathML+SVG (XHTML host)   xhtml-math-svg-xh   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
-	XHTML+MathML+SVG (SVG host)     xhtml-math-svg-sh   <!DOCTYPE svg:svg PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
-	XHTML+RDFa 1.0                  xhtml-rdfa-1        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
-	XHTML+RDFa 1.1                  xhtml-rdfa-2        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+	HTML 4 Strict                   html4-strict        <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "https://www.w3.org/TR/html4/strict.dtd">
+	HTML 4 Transitional             html4-trans         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
+	HTML 4 Frameset                 html4-frame         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "https://www.w3.org/TR/html4/frameset.dtd">
+	MathML 1.01                     mathml1             <!DOCTYPE math SYSTEM "https://www.w3.org/Math/DTD/mathml1/mathml.dtd">
+	MathML 2.0                      mathml2             <!DOCTYPE math PUBLIC "-//W3C//DTD MathML 2.0//EN" "https://www.w3.org/Math/DTD/mathml2/mathml2.dtd">
+	SVG 1.0                         svg10               <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "https://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+	SVG 1.1 Full                    svg11               <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+	SVG 1.1 Basic                   svg11-basic         <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1 Basic//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11-basic.dtd">
+	SVG 1.1 Tiny                    svg11-tiny          <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1 Tiny//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11-tiny.dtd">
+	XHTML+MathML+SVG (XHTML host)   xhtml-math-svg-xh   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "https://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
+	XHTML+MathML+SVG (SVG host)     xhtml-math-svg-sh   <!DOCTYPE svg:svg PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "https://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
+	XHTML+RDFa 1.0                  xhtml-rdfa-1        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "https://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+	XHTML+RDFa 1.1                  xhtml-rdfa-2        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "https://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
 	=============================== =================== ==================================================================================================================================================
-
-.. function:: br([$count = 1])
-
-	:param	int	$count: Number of times to repeat the tag
-	:returns:	HTML line break tag
-	:rtype:	string
-
-	Generates line break tags (<br />) based on the number you submit.
-	Example::
-
-		echo br(3);
-
-	The above would produce:
-
-	.. code-block:: html
-
-		<br /><br /><br />
-
-	.. note:: This function is DEPRECATED. Use the native ``str_repeat()``
-		in combination with ``<br />`` instead.
-
-.. function:: nbs([$num = 1])
-
-	:param	int	$num: Number of space entities to produce
-	:returns:	A sequence of non-breaking space HTML entities
-	:rtype:	string
-
-	Generates non-breaking spaces (&nbsp;) based on the number you submit.
-	Example::
-
-		echo nbs(3);
-
-	The above would produce:
-
-	.. code-block:: html
-
-		&nbsp;&nbsp;&nbsp;
-
-	.. note:: This function is DEPRECATED. Use the native ``str_repeat()``
-		in combination with ``&nbsp;`` instead.

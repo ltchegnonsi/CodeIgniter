@@ -18,7 +18,7 @@ requirements are not met.
 Example Usage
 *************
 
-The following example will load the cache driver, specify `APC <#apc>`_
+The following example will load the cache driver, specify `APC <#alternative-php-cache-apc-caching>`_
 as the driver to use, and fall back to file-based caching if APC is not
 available in the hosting environment.
 
@@ -42,7 +42,8 @@ to avoid collisions when you're running multiple applications on the same enviro
 
 ::
 
-	$this->load->driver('cache',
+	$this->load->driver(
+		'cache',
 		array('adapter' => 'apc', 'backup' => 'file', 'key_prefix' => 'my_')
 	);
 
@@ -52,9 +53,9 @@ to avoid collisions when you're running multiple applications on the same enviro
 Class Reference
 ***************
 
-.. class:: CI_Cache
+.. php:class:: CI_Cache
 
-	.. method:: is_supported($driver)
+	.. php:method:: is_supported($driver)
 
 		:param	string	$driver: the name of the caching driver
 		:returns:	TRUE if supported, FALSE if not
@@ -66,7 +67,7 @@ Class Reference
 		hosting environment.
 		::
 
-			if ($this->cache->apc->is_supported()
+			if ($this->cache->apc->is_supported())
 			{
 				if ($data = $this->cache->apc->get('my_cache'))
 				{
@@ -74,7 +75,7 @@ Class Reference
 				}
 			}
 
-	.. method:: get($id)
+	.. php:method:: get($id)
 
 		:param	string	$id: Cache item name
 		:returns:	Item value or FALSE if not found
@@ -86,7 +87,7 @@ Class Reference
 
 			$foo = $this->cache->get('my_cached_item');
 
-	.. method:: save($id, $data[, $ttl = 60[, $raw = FALSE]])
+	.. php:method:: save($id, $data[, $ttl = 60[, $raw = FALSE]])
 
 		:param	string	$id: Cache item name
 		:param	mixed	$data: the data to save
@@ -101,10 +102,10 @@ Class Reference
 
 			$this->cache->save('cache_item_id', 'data_to_cache');
 
-		.. note:: The ``$raw`` parameter is only utilized by APC and Memcache,
+		.. note:: The ``$raw`` parameter is only utilized by APC, APCu and Memcache,
 			in order to allow usage of ``increment()`` and ``decrement()``.
 
-	.. method:: delete($id)
+	.. php:method:: delete($id)
 
 		:param	string	$id: name of cached item
 		:returns:	TRUE on success, FALSE on failure
@@ -116,7 +117,7 @@ Class Reference
 
 			$this->cache->delete('cache_item_id');
 
-	.. method:: increment($id[, $offset = 1])
+	.. php:method:: increment($id[, $offset = 1])
 
 		:param	string	$id: Cache ID
 		:param	int	$offset: Step/value to add
@@ -132,7 +133,7 @@ Class Reference
 
 			$this->cache->increment('iterator', 3); // 'iterator' is now 6
 
-	.. method:: decrement($id[, $offset = 1])
+	.. php:method:: decrement($id[, $offset = 1])
 
 		:param	string	$id: Cache ID
 		:param	int	$offset: Step/value to reduce by
@@ -148,7 +149,7 @@ Class Reference
 
 			$this->cache->decrement('iterator', 2); // 'iterator' is now 3
 
-	.. method:: clean()
+	.. php:method:: clean()
 
 		:returns:	TRUE on success, FALSE on failure
 		:rtype:	bool
@@ -159,7 +160,7 @@ Class Reference
 
 			$this->cache->clean();
 
-	.. method:: cache_info()
+	.. php:method:: cache_info()
 
 		:returns:	Information on the entire cache database
 		:rtype:	mixed
@@ -172,7 +173,7 @@ Class Reference
 		.. note:: The information returned and the structure of the data is dependent
 			on which adapter is being used.
 
-	.. method:: get_metadata($id)
+	.. php:method:: get_metadata($id)
 
 		:param	string	$id: Cache item name
 		:returns:	Metadata for the cached item
@@ -186,6 +187,16 @@ Class Reference
 
 		.. note:: The information returned and the structure of the data is dependent
 			on which adapter is being used.
+
+	.. php:method:: get_loaded_driver()
+
+		:returns:	Loaded driver name after initialization ('apc', 'apcu', 'dummy', 'file', 'memcached', 'redis' or 'wincache')
+		:rtype:	string
+
+		This method will return the caching driver currently used after initialization.
+		::
+
+			echo $this->cache->get_loaded_driver(); // Will return something like "file"
 
 *******
 Drivers
@@ -201,7 +212,19 @@ specific adapter to the driver loader as follows::
 	$this->cache->apc->save('foo', 'bar', 10);
 
 For more information on APC, please see
-`http://php.net/apc <http://php.net/apc>`_.
+`https://php.net/apc <https://php.net/apc>`_.
+
+APC User Cache (APCu) Caching
+=============================
+
+All of the methods listed above can be accessed without passing a
+specific adapter to the driver loader as follows::
+
+	$this->load->driver('cache');
+	$this->cache->apcu->save('foo', 'bar', 10);
+
+For more information on APCu, please see
+`https://php.net/apcu <https://php.net/apcu>`_.
 
 File-based Caching
 ==================
@@ -230,7 +253,7 @@ specific adapter to the driver loader as follows::
 	$this->cache->memcached->save('foo', 'bar', 10);
 
 For more information on Memcached, please see
-`http://php.net/memcached <http://php.net/memcached>`_.
+`https://php.net/memcached <https://php.net/memcached>`_.
 
 WinCache Caching
 ================
@@ -244,20 +267,17 @@ specific adapter to the driver loader as follows::
 	$this->cache->wincache->save('foo', 'bar', 10);
 
 For more information on WinCache, please see
-`http://php.net/wincache <http://php.net/wincache>`_.
+`https://php.net/wincache <https://php.net/wincache>`_.
 
 Redis Caching
 =============
 
 Redis is an in-memory key-value store which can operate in LRU cache mode. 
-To use it, you need Redis server and phpredis PHP extension 
-`https://github.com/nicolasff/phpredis <https://github.com/nicolasff/phpredis>`_.
+To use it, you need `Redis server and phpredis PHP extension <https://github.com/phpredis/phpredis>`_.
 
 Config options to connect to redis server must be stored in the application/config/redis.php file.
 Available options are::
 	
-	$config['socket_type'] = 'tcp'; //`tcp` or `unix`
-	$config['socket'] = '/var/run/redis.sock'; // in case of `unix` socket type
 	$config['host'] = '127.0.0.1';
 	$config['password'] = NULL;
 	$config['port'] = 6379;
@@ -270,7 +290,7 @@ specific adapter to the driver loader as follows::
 	$this->cache->redis->save('foo', 'bar', 10);
 
 For more information on Redis, please see
-`http://redis.io <http://redis.io>`_.
+`https://redis.io <https://redis.io>`_.
 
 Dummy Cache
 ===========

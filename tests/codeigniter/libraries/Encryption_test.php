@@ -94,10 +94,22 @@ class Encryption_test extends CI_TestCase {
 		}
 
 		// Test default length, it must match the digest size
-		$this->assertEquals(64, strlen($this->encryption->hkdf('foobar', 'sha512')));
+		$hkdf_result = $this->encryption->hkdf('foobar', 'sha512');
+		$this->assertEquals(
+			64,
+			defined('MB_OVERLOAD_STRING')
+				? mb_strlen($hkdf_result, '8bit')
+				: strlen($hkdf_result)
+		);
 
 		// Test maximum length (RFC5869 says that it must be up to 255 times the digest size)
-		$this->assertEquals(12240, strlen($this->encryption->hkdf('foobar', 'sha384', NULL, 48 * 255)));
+		$hkdf_result = $this->encryption->hkdf('foobar', 'sha384', NULL, 48 * 255);
+		$this->assertEquals(
+			12240,
+			defined('MB_OVERLOAD_STRING')
+				? mb_strlen($hkdf_result, '8bit')
+				: strlen($hkdf_result)
+		);
 		$this->assertFalse($this->encryption->hkdf('foobar', 'sha224', NULL, 28 * 255 + 1));
 
 		// CI-specific test for an invalid digest
@@ -108,8 +120,6 @@ class Encryption_test extends CI_TestCase {
 
 	/**
 	 * _get_params() test
-	 *
-	 * @uses	Mock_Libraries_Encryption::__get_params()
 	 */
 	public function test__get_params()
 	{
@@ -141,9 +151,8 @@ class Encryption_test extends CI_TestCase {
 			'hmac_key' => str_repeat("\x0", 16)
 		);
 
-		$this->assertTrue(is_array($this->encryption->__get_params($params)));
+		$this->assertInternalType('array', $this->encryption->__get_params($params));
 
-		$params['iv'] = NULL;
 		$params['base64'] = TRUE;
 		$params['hmac_digest'] = 'sha512';
 
@@ -152,22 +161,22 @@ class Encryption_test extends CI_TestCase {
 			'cipher' => 'aes-128',
 			'mode' => 'cbc',
 			'key' => str_repeat("\x0", 16),
-			'iv' => str_repeat("\x0", 16),
 			'raw_data' => TRUE,
 			'hmac_key' => str_repeat("\x0", 16),
 			'hmac_digest' => 'sha256'
 		);
 
 		$output = $this->encryption->__get_params($params);
-		unset($output['handle'], $params['raw_data']);
+		unset($output['handle'], $output['cipher'], $params['raw_data'], $params['cipher']);
 		$params['base64'] = FALSE;
 		$this->assertEquals($params, $output);
 
 		// HMAC disabled
 		unset($params['hmac_key'], $params['hmac_digest']);
 		$params['hmac'] = $params['raw_data'] = FALSE;
+		$params['cipher'] = 'aes-128';
 		$output = $this->encryption->__get_params($params);
-		unset($output['handle'], $params['hmac'], $params['raw_data']);
+		unset($output['handle'], $output['cipher'], $params['hmac'], $params['raw_data'], $params['cipher']);
 		$params['base64'] = TRUE;
 		$params['hmac_digest'] = $params['hmac_key'] = NULL;
 		$this->assertEquals($params, $output);
@@ -199,7 +208,7 @@ class Encryption_test extends CI_TestCase {
 		$this->assertEquals($message, $this->encryption->decrypt($this->encryption->encrypt($message)));
 
 		// Try DES in ECB mode, just for the sake of changing stuff
-		$this->encryption->initialize(array('cipher' => 'des', 'mode' => 'ecb'));
+		$this->encryption->initialize(array('cipher' => 'des', 'mode' => 'ecb', 'key' => substr($key, 0, 8)));
 		$this->assertEquals($message, $this->encryption->decrypt($this->encryption->encrypt($message)));
 	}
 
@@ -218,22 +227,17 @@ class Encryption_test extends CI_TestCase {
 		$this->assertFalse($this->encryption->encrypt($message, array('foo')));
 		$this->assertFalse($this->encryption->decrypt($message, array('foo')));
 
-		// Custom IV (we'll check it), no HMAC, binary output
+		// No HMAC, binary output
 		$params = array(
 			'cipher' => 'tripledes',
 			'mode' => 'cfb',
 			'key' => str_repeat("\x1", 16),
-			'iv' => str_repeat("\x2", 8),
 			'base64' => FALSE,
 			'hmac' => FALSE
 		);
 
 		$ciphertext = $this->encryption->encrypt($message, $params);
-		$this->assertEquals(0, strncmp($params['iv'], $ciphertext, 8));
 
-		// IV should be found in the cipher-text, no matter if it was supplied or not
-		$this->assertEquals($message, $this->encryption->decrypt($ciphertext, $params));
-		unset($params['iv']);
 		$this->assertEquals($message, $this->encryption->decrypt($ciphertext, $params));
 	}
 
@@ -248,8 +252,12 @@ class Encryption_test extends CI_TestCase {
 		{
 			return $this->markTestSkipped('Cannot test MCrypt because it is not available.');
 		}
+		elseif (version_compare(PHP_VERSION, '7.1.0-alpha', '>='))
+		{
+			return $this->markTestSkipped('ext/mcrypt is deprecated since PHP 7.1 and will generate notices here.');
+		}
 
-		$this->assertTrue(is_resource($this->encryption->__driver_get_handle('mcrypt', 'rijndael-128', 'cbc')));
+		$this->assertInternalType('resource', $this->encryption->__driver_get_handle('mcrypt', 'rijndael-128', 'cbc'));
 	}
 
 	// --------------------------------------------------------------------
@@ -281,6 +289,10 @@ class Encryption_test extends CI_TestCase {
 		{
 			$this->markTestSkipped('Both MCrypt and OpenSSL support are required for portability tests.');
 			return;
+		}
+		elseif (version_compare(PHP_VERSION, '7.1.0-alpha', '>='))
+		{
+			return $this->markTestSkipped('ext/mcrypt is deprecated since PHP 7.1 and will generate notices here.');
 		}
 
 		$message = 'This is a message encrypted via MCrypt and decrypted via OpenSSL, or vice-versa.';
